@@ -1,0 +1,20 @@
+# Core
+pandas
+requests
+python-dotenv
+
+# Database
+sqlalchemy
+psycopg2-binary
+
+# Exploration
+jupyterlab
+matplotlib
+
+# Added later in the project:
+# dbt-postgres
+# streamlit
+# plotly
+
+# Once your environment is stable, pin it:
+#   pip freeze > requirements.txt
