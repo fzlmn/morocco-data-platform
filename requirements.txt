@@ -8,7 +8,7 @@ sqlalchemy
 psycopg2-binary
 
 # Exploration
-jupyterlab
+ipykernel
 matplotlib
 
 # Added later in the project:
