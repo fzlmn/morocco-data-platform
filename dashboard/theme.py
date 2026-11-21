@@ -209,15 +209,21 @@ section[data-testid="stSidebar"] div[role="radiogroup"] > label:nth-of-type(3):h
     background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%25230d3b35%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2021h18%22%2F%3E%3Cpath%20d%3D%22M6%2021V12%22%2F%3E%3Cpath%20d%3D%22M12%2021V5%22%2F%3E%3Cpath%20d%3D%22M18%2021v-6%22%2F%3E%3C%2Fsvg%3E");
 }}
 section[data-testid="stSidebar"] div[role="radiogroup"] > label:nth-of-type(4) p::before {{
-    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2523b9d4ce%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%203l7.5%203v5.5c0%204.4-3.1%208.2-7.5%209.5C7.6%2019.7%204.5%2015.9%204.5%2011.5V6z%22%2F%3E%3Cpath%20d%3D%22M9%2012.2l2.2%202.2L15.2%2010%22%2F%3E%3C%2Fsvg%3E");
-}}
-section[data-testid="stSidebar"] div[role="radiogroup"] > label:nth-of-type(4):has(input:checked) p::before {{
-    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%25230d3b35%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%203l7.5%203v5.5c0%204.4-3.1%208.2-7.5%209.5C7.6%2019.7%204.5%2015.9%204.5%2011.5V6z%22%2F%3E%3Cpath%20d%3D%22M9%2012.2l2.2%202.2L15.2%2010%22%2F%3E%3C%2Fsvg%3E");
-}}
-section[data-testid="stSidebar"] div[role="radiogroup"] > label:nth-of-type(5) p::before {{
     background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2523b9d4ce%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%202.8l8.4%204.7L12%2012.2%203.6%207.5z%22%2F%3E%3Cpath%20d%3D%22M3.6%2012.4L12%2017.1l8.4-4.7%22%2F%3E%3Cpath%20d%3D%22M3.6%2016.9L12%2021.6l8.4-4.7%22%2F%3E%3C%2Fsvg%3E");
 }}
+section[data-testid="stSidebar"] div[role="radiogroup"] > label:nth-of-type(4):has(input:checked) p::before {{
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%25230d3b35%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%202.8l8.4%204.7L12%2012.2%203.6%207.5z%22%2F%3E%3Cpath%20d%3D%22M3.6%2012.4L12%2017.1l8.4-4.7%22%2F%3E%3Cpath%20d%3D%22M3.6%2016.9L12%2021.6l8.4-4.7%22%2F%3E%3C%2Fsvg%3E");
+}}
+section[data-testid="stSidebar"] div[role="radiogroup"] > label:nth-of-type(5) p::before {{
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2523b9d4ce%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%203l7.5%203v5.5c0%204.4-3.1%208.2-7.5%209.5C7.6%2019.7%204.5%2015.9%204.5%2011.5V6z%22%2F%3E%3Cpath%20d%3D%22M9%2012.2l2.2%202.2L15.2%2010%22%2F%3E%3C%2Fsvg%3E");
+}}
 section[data-testid="stSidebar"] div[role="radiogroup"] > label:nth-of-type(5):has(input:checked) p::before {{
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%25230d3b35%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%203l7.5%203v5.5c0%204.4-3.1%208.2-7.5%209.5C7.6%2019.7%204.5%2015.9%204.5%2011.5V6z%22%2F%3E%3Cpath%20d%3D%22M9%2012.2l2.2%202.2L15.2%2010%22%2F%3E%3C%2Fsvg%3E");
+}}
+section[data-testid="stSidebar"] div[role="radiogroup"] > label:nth-of-type(6) p::before {{
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2523b9d4ce%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%202.8l8.4%204.7L12%2012.2%203.6%207.5z%22%2F%3E%3Cpath%20d%3D%22M3.6%2012.4L12%2017.1l8.4-4.7%22%2F%3E%3Cpath%20d%3D%22M3.6%2016.9L12%2021.6l8.4-4.7%22%2F%3E%3C%2Fsvg%3E");
+}}
+section[data-testid="stSidebar"] div[role="radiogroup"] > label:nth-of-type(6):has(input:checked) p::before {{
     background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%25230d3b35%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%202.8l8.4%204.7L12%2012.2%203.6%207.5z%22%2F%3E%3Cpath%20d%3D%22M3.6%2012.4L12%2017.1l8.4-4.7%22%2F%3E%3Cpath%20d%3D%22M3.6%2016.9L12%2021.6l8.4-4.7%22%2F%3E%3C%2Fsvg%3E");
 }}
 
@@ -323,5 +329,65 @@ div[data-testid="stDataFrame"] {{ border-radius: 8px; overflow: hidden; }}
     color: {INK_MUTED}; font-size: 12px; margin-top: 40px;
     padding-top: 16px; border-top: 1px solid {BORDER};
 }}
+
+/* ===== hover definitions ===== */
+.tip {{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: help;
+}}
+.tip-mark {{
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: {GRID}; color: {INK_MUTED};
+    font-size: 9px; font-weight: 700; line-height: 1;
+    flex-shrink: 0;
+}}
+.tip:hover .tip-mark {{ background: {BRAND_SOFT}; color: {BRAND}; }}
+
+.tip-body {{
+    visibility: hidden; opacity: 0;
+    position: absolute; bottom: calc(100% + 8px); left: 0;
+    z-index: 1000; width: 290px;
+    background: {INK_PRIMARY}; color: #f2f5f4;
+    padding: 12px 14px; border-radius: 10px;
+    font-size: 12.5px; font-weight: 400; line-height: 1.5;
+    letter-spacing: 0;
+    box-shadow: 0 6px 20px rgba(15,28,26,0.26);
+    transition: opacity 0.14s ease;
+    pointer-events: none;
+    white-space: normal; text-align: left;
+}}
+.tip-body strong {{
+    display: block; font-size: 13px; font-weight: 600;
+    color: #ffffff; margin-bottom: 2px;
+}}
+.tip-body em {{
+    display: block; font-style: normal; font-size: 11px;
+    color: {BRAND_ACCENT}; margin-bottom: 7px; font-weight: 500;
+}}
+.tip:hover .tip-body {{ visibility: visible; opacity: 1; }}
+
+/* ===== definitions page ===== */
+.def-head {{
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px; margin-bottom: 10px;
+}}
+.def-name {{ font-size: 16px; font-weight: 600; color: {INK_PRIMARY}; }}
+.def-code {{
+    font-size: 11px; color: {BRAND}; background: {BRAND_SOFT};
+    padding: 3px 9px; border-radius: 6px; font-weight: 600;
+    white-space: nowrap;
+}}
+.def-row {{ display: flex; gap: 14px; margin-bottom: 10px; }}
+.def-key {{
+    font-size: 11px; color: {INK_MUTED}; font-weight: 600;
+    width: 74px; flex-shrink: 0; padding-top: 1px;
+}}
+.def-val {{ font-size: 13.5px; color: {INK_SECONDARY}; line-height: 1.6; }}
+.def-row.caveat .def-val {{ color: {INK_PRIMARY}; }}
+.def-row.caveat .def-key {{ color: #b45309; }}
 </style>
 """

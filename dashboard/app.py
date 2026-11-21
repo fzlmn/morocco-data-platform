@@ -20,9 +20,9 @@ import streamlit as st
 from plotly.subplots import make_subplots
 from sqlalchemy import create_engine, text
 
-from dashboard import icons, theme
+from dashboard import glossary, icons, theme
 
-st.set_page_config(page_title="Morocco Data Platform", page_icon=":bar_chart:",
+st.set_page_config(page_title="Morocco Data Platform", page_icon=str(Path(__file__).parent / "assets" / "favicon.png"),
                    layout="wide", initial_sidebar_state="expanded")
 st.markdown(theme.CSS, unsafe_allow_html=True)
 
@@ -126,7 +126,7 @@ def stat_card(container, label, column, df, icon_name, colour,
               </div>
               {delta_html}
             </div>
-            <div class="stat-label">{label}</div>
+            <div class="stat-label">{glossary.tooltip(column, label)}</div>
             <div class="stat-value">{value:,.{decimals}f}{suffix}</div>
             <div class="stat-sub">latest published · {year}</div>
             """,
@@ -141,8 +141,9 @@ def stat_card(container, label, column, df, icon_name, colour,
                             key=f"spark_{column}")
 
 
-def section(title, note=""):
-    st.markdown(f'<div class="section-title">{title}</div>',
+def section(title, note="", define=None):
+    heading = glossary.tooltip(define, title) if define else title
+    st.markdown(f'<div class="section-title">{heading}</div>',
                 unsafe_allow_html=True)
     if note:
         st.markdown(f'<p class="section-note">{note}</p>',
@@ -193,7 +194,7 @@ with st.sidebar:
     page = st.radio(
         "Navigation",
         ["Overview", "Prices & currency", "Output & labour",
-         "Data quality", "How it works"],
+         "Definitions", "Data quality", "How it works"],
         label_visibility="collapsed",
     )
 
@@ -267,7 +268,8 @@ if page_name == "Overview":
 
     section("Consumer price inflation",
             "The annual rate against a trailing three-year average. The "
-            "average separates a one-year shock from a sustained move.")
+            "average separates a one-year shock from a sustained move.",
+            define="inflation_pct")
     with st.container(border=True):
         fig = go.Figure()
         fig.add_trace(go.Scatter(
@@ -331,7 +333,8 @@ elif page_name == "Prices & currency":
 
     section("Year-on-year currency movement",
             "Positive bars mean the dirham weakened against the dollar that "
-            "year; negative bars mean it strengthened.")
+            "year; negative bars mean it strengthened.",
+            define="mad_depreciation_pct")
     with st.container(border=True):
         dep = view.dropna(subset=["mad_depreciation_pct"])
         fig3 = go.Figure(go.Bar(
@@ -350,7 +353,8 @@ elif page_name == "Prices & currency":
 
 elif page_name == "Output & labour":
     section("Output", "GDP per capita in current dollars alongside annual real "
-                      "growth. Contraction years are marked in red.")
+                      "growth. Contraction years are marked in red.",
+            define="gdp_per_capita_usd")
     left, right = st.columns(2)
     with left.container(border=True):
         st.plotly_chart(area(view, "gdp_per_capita_usd",
@@ -372,7 +376,8 @@ elif page_name == "Output & labour":
                         key="out_growth")
 
     section("Labour", "Unemployment is a modelled ILO estimate and the series "
-                      "with the thinnest coverage.")
+                      "with the thinnest coverage.",
+            define="unemployment_pct")
     with st.container(border=True):
         st.plotly_chart(area(view, "unemployment_pct", "Unemployment", ORANGE,
                              "% of labour force", height=300),
@@ -388,6 +393,66 @@ elif page_name == "Output & labour":
                 gdp_per_capita=("gdp_per_capita_usd", "mean"),
             ).round(2).reset_index(),
             use_container_width=True, hide_index=True)
+
+# --- Definitions -----------------------------------------------------------
+
+elif page_name == "Definitions":
+    section("What each number means",
+            "Every indicator on this dashboard, what it measures, how to "
+            "read a movement in it, and the thing about it that most often "
+            "misleads people. Definitions follow the World Bank's own "
+            "metadata rather than a loose paraphrase — these are the terms "
+            "the figures were produced under.")
+
+    for ind in glossary.INDICATORS.values():
+        with st.container(border=True):
+            st.markdown(
+                f"""
+                <div class="def-head">
+                  <div class="def-name">{ind.name}</div>
+                  <div class="def-code">{ind.code}</div>
+                </div>
+                <div class="def-row">
+                  <div class="def-key">Measures</div>
+                  <div class="def-val">{ind.measures}</div>
+                </div>
+                <div class="def-row">
+                  <div class="def-key">Reading it</div>
+                  <div class="def-val">{ind.reading}</div>
+                </div>
+                <div class="def-row caveat">
+                  <div class="def-key">Careful</div>
+                  <div class="def-val">{ind.caveat}</div>
+                </div>
+                """,
+                unsafe_allow_html=True)
+
+    section("Derived measures",
+            "Not published by the World Bank — computed in the dbt mart "
+            "with window functions.")
+
+    for ind in glossary.DERIVED.values():
+        with st.container(border=True):
+            st.markdown(
+                f"""
+                <div class="def-head">
+                  <div class="def-name">{ind.name}</div>
+                  <div class="def-code">computed in dbt</div>
+                </div>
+                <div class="def-row">
+                  <div class="def-key">Measures</div>
+                  <div class="def-val">{ind.measures}</div>
+                </div>
+                <div class="def-row">
+                  <div class="def-key">Reading it</div>
+                  <div class="def-val">{ind.reading}</div>
+                </div>
+                <div class="def-row caveat">
+                  <div class="def-key">Careful</div>
+                  <div class="def-val">{ind.caveat}</div>
+                </div>
+                """,
+                unsafe_allow_html=True)
 
 # --- Data quality ----------------------------------------------------------
 
