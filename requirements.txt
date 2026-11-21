@@ -11,10 +11,12 @@ psycopg2-binary
 ipykernel
 matplotlib
 
-# Added later in the project:
-# dbt-postgres
-# streamlit
-# plotly
+# Transformation
+dbt-postgres
+
+# Dashboard
+streamlit
+plotly
 
 # Once your environment is stable, pin it:
 #   pip freeze > requirements.txt

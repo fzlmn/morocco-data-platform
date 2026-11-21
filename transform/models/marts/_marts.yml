@@ -1,0 +1,55 @@
+version: 2
+
+models:
+  - name: dim_indicator
+    description: One row per World Bank indicator, with unit type and coverage.
+    columns:
+      - name: indicator_code
+        description: Primary key.
+        data_tests: [unique, not_null]
+      - name: unit_type
+        data_tests:
+          - accepted_values:
+              values: [percent, usd, exchange_rate, other]
+      - name: coverage_pct
+        description: Share of years that carry a published value.
+
+  - name: fct_indicator_observation
+    description: >
+      Long fact table, one row per country/indicator/year. Use this for
+      series-level analysis; use mart_macro_annual for cross-indicator work.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [country_code, indicator_code, year]
+    columns:
+      - name: observation_key
+        data_tests: [unique, not_null]
+      - name: indicator_code
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_indicator')
+              field: indicator_code
+      - name: year
+        data_tests: [not_null]
+
+  - name: mart_macro_annual
+    description: >
+      One row per country and year with every indicator as a column, plus
+      derived measures. This is what the Streamlit dashboard queries.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [country_code, year]
+    columns:
+      - name: year
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1960
+              max_value: 2100
+      - name: inflation_pct
+        description: Annual consumer price inflation, percent.
+      - name: mad_per_usd
+        description: Official exchange rate, dirhams per US dollar.
+      - name: mad_depreciation_pct
+        description: Year-on-year change in the exchange rate; positive = weaker dirham.

@@ -1,0 +1,15 @@
+# Normalise line endings so Windows checkouts stop producing CRLF warnings
+# and diffs stay clean across machines.
+* text=auto eol=lf
+
+*.sh   text eol=lf
+*.sql  text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+*.py   text eol=lf
+*.md   text eol=lf
+
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary

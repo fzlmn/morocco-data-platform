@@ -1,0 +1,10 @@
+line-length = 88
+target-version = "py312"
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E501"]
+
+[lint.per-file-ignores]
+"dashboard/app.py" = ["E402"]   # sys.path is set before the imports by design
+"dashboard/icons.py" = ["E501"] # generated data URIs

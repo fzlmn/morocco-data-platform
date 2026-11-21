@@ -1,0 +1,13 @@
+# Copy to profiles.yml and set your password. profiles.yml is gitignored.
+morocco:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      port: 5432
+      user: morocco
+      password: CHANGE_ME
+      dbname: morocco_data
+      schema: analytics
+      threads: 4

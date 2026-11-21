@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: stg_worldbank_indicators
+    description: Cleaned World Bank observations, one row per country/indicator/year.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [country_code, indicator_code, year]
+    columns:
+      - name: country_code
+        description: ISO-3166 alpha-3 country code.
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ["MAR"]
+      - name: indicator_code
+        description: World Bank indicator identifier, e.g. FP.CPI.TOTL.ZG.
+        data_tests: [not_null]
+      - name: year
+        description: Observation year.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1960
+              max_value: 2100
+      - name: value
+        description: >
+          The observed figure. Nullable by design - 31 of 66 unemployment
+          years and 7 GDP-growth years have no published figure. A missing
+          year is a real fact about the source, so it is kept rather than
+          zero-filled.

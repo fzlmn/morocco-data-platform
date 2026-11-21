@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff
+      - name: Ruff
+        run: ruff check . --output-format=github
+
+  pipeline:
+    name: Pipeline and dbt tests
+    runs-on: ubuntu-latest
+
+    # A real Postgres, so this runs the pipeline end to end rather than
+    # only checking that the SQL parses.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: morocco
+          POSTGRES_PASSWORD: morocco
+          POSTGRES_DB: morocco_data
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U morocco"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      POSTGRES_USER: morocco
+      POSTGRES_PASSWORD: morocco
+      POSTGRES_DB: morocco_data
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: "5432"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Create schemas
+        run: |
+          PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U morocco \
+            -d morocco_data -f sql/init/01_schemas.sql
+
+      - name: Extract and load
+        run: python run_pipeline.py
+
+      - name: Idempotency check
+        run: |
+          python run_pipeline.py
+          COUNT=$(PGPASSWORD=$POSTGRES_PASSWORD psql -h localhost -U morocco \
+            -d morocco_data -tAc \
+            "select count(*) from raw.worldbank_indicators")
+          echo "rows after two runs: $COUNT"
+          test "$COUNT" -eq 330
+
+      - name: dbt profile
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml <<EOF
+          morocco:
+            target: ci
+            outputs:
+              ci:
+                type: postgres
+                host: localhost
+                port: 5432
+                user: morocco
+                password: morocco
+                dbname: morocco_data
+                schema: analytics
+                threads: 4
+          EOF
+
+      - name: dbt build
+        run: |
+          dbt deps  --project-dir transform
+          dbt build --project-dir transform --target ci

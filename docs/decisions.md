@@ -50,11 +50,12 @@ no blank country codes. Source last updated 2026-10-08.
    so they must be unpacked before the row can go into a relational table.
 3. *`date` is a string*, not a number or a date; cast to integer year.
 
-**On nulls:** this series happens to be complete, which is unusual — most World
-Bank indicators have gaps at the recent end, because a figure appears only once
-the national statistics office publishes it. The schema must therefore still
-allow nulls in `value`, and the dbt test on that column cannot be `not_null`:
-the next indicator added will almost certainly have them. A missing year is a
+**On nulls:** the inflation series is complete, which turned out to be the
+exception. Across the five indicators now loaded: unemployment is missing 31 of
+66 years and GDP growth 7, while inflation, GDP per capita and the exchange rate
+have none. The schema therefore allows nulls in `value` and the dbt test on that
+column is deliberately not `not_null` — a decision taken on principle before
+there was any evidence for it, and since confirmed by the data. A missing year is a
 real fact about the data, so nulls are kept rather than dropped or zero-filled —
 zero would read as "no inflation that year", which is a false statement.
 
@@ -70,6 +71,26 @@ and 2014 (0.4%) near zero in a low-inflation decade.
 **Why it matters:** values in a plausible range mean the unit is being read
 correctly — the indicator is an annual percentage, not an index level. An index
 would have come through in the hundreds and been loaded without complaint.
+
+---
+
+## 2026-11-21 — Country code: use `countryiso3code`, not `country.id`
+**Found by:** the `accepted_values` test on `stg_worldbank_indicators.country_code`,
+which failed on the first `dbt test` run.
+**The bug:** the extractor read `obs["country"]["id"]`, which is the **ISO-2**
+code (`MA`). The adjacent `countryiso3code` field carries **ISO-3** (`MAR`).
+Both are present in every observation and neither is labelled; nothing about the
+response makes the difference obvious.
+**Why it mattered:** the pipeline ran clean, the loader reported 330 rows, and
+every number in the warehouse was correct. Only the country identifier was
+wrong — which would have broken the moment a second country or any join on an
+ISO-3 key was added, and would have been invisible until then.
+**Fix:** read `countryiso3code`, falling back to `country.id` when it is empty
+(aggregate regions such as "Arab World" leave it blank).
+**The wider point:** this is the argument for schema tests. No exception was
+raised, no count was off, and the exploration notebook had used the right field
+back in October. A test that asserted a known truth about the data caught what
+reading the code did not.
 
 ---
 

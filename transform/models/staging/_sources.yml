@@ -1,0 +1,22 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    description: Landing zone. Written by the Python extract/load pipeline.
+    tables:
+      - name: worldbank_indicators
+        description: >
+          One row per country, indicator and year, as returned by the World
+          Bank API. Loaded by run_pipeline.py, upserted on the natural key.
+        loaded_at_field: loaded_at
+        freshness:
+          warn_after: {count: 30, period: day}
+          error_after: {count: 90, period: day}
+        columns:
+          - name: country_code
+            data_tests: [not_null]
+          - name: indicator_code
+            data_tests: [not_null]
+          - name: year
+            data_tests: [not_null]

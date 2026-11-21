@@ -32,6 +32,13 @@ env/
 target/
 dbt_packages/
 logs/
+transform/target/
+transform/dbt_packages/
+transform/logs/
+transform/profiles.yml
+transform/.user.yml
+transform/package-lock.yml
+!transform/profiles.yml.example
 
 # --- Editors / OS ---
 .vscode/

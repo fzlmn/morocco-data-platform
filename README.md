@@ -1,16 +1,28 @@
 # Morocco Data Platform
 
-**An end-to-end analytics platform for Moroccan public economic data** — ingestion, tested transformations, and an interactive dashboard.
+**An end-to-end analytics pipeline for Moroccan macroeconomic data** — ingested
+from the World Bank API, modelled and tested with dbt, served as an interactive
+dashboard.
+
+![CI](https://github.com/fzlmn/morocco-data-platform/actions/workflows/ci.yml/badge.svg)
+
+> **Live demo:** _(link goes here once deployed)_
 
 ---
 
 ## Why this project
 
-Morocco publishes a real amount of economic data, but it lives in incompatible places: the World Bank exposes indicators through a JSON API, the HCP releases consumer price indices as spreadsheets, and exchange rates arrive in a third format entirely. Different schemas, different update cadences, no common key.
+Morocco publishes a real amount of economic data, but it arrives in
+incompatible shapes. Answering something as simple as *"how has inflation moved
+relative to the dirham over the last three decades?"* means pulling several
+series, reconciling their coverage, and lining them up by year — by hand, every
+time you want to ask again.
 
-Answering something as simple as *"how has inflation moved relative to the exchange rate over the last decade?"* currently means downloading three files and reconciling them by hand, every time.
+This builds the pipeline that does it once, correctly, and repeatably: raw
+responses land in a warehouse, transformations are version-controlled and
+tested, and the result is queryable and visualised.
 
-This project builds the pipeline that does it once, correctly, and repeatably: raw sources land in a warehouse, transformations are version-controlled and tested, and the result is queryable and visualised.
+**330 observations · 5 indicators · 1960–2025 · 24 data quality tests.**
 
 ---
 
@@ -18,14 +30,23 @@ This project builds the pipeline that does it once, correctly, and repeatably: r
 
 ```mermaid
 flowchart LR
-    A[World Bank API] --> D[Extract<br/>Python]
-    B[HCP / data.gov.ma<br/>CSV] --> D
-    C[FX rates] --> D
-    D --> E[(PostgreSQL<br/>raw schema)]
-    E --> F[dbt<br/>staging to marts]
-    F --> G[(PostgreSQL<br/>analytics schema)]
-    G --> H[Streamlit<br/>dashboard]
-    F -.-> I[dbt tests]
+    A["World Bank API<br/>5 indicator series"] --> B["extract/<br/>Python + requests"]
+    B --> C[("raw.worldbank_indicators<br/>PostgreSQL")]
+    C --> D["staging<br/>dbt view"]
+    D --> E["marts<br/>dbt tables"]
+    E --> F["Streamlit<br/>dashboard"]
+    D -.->|24 tests| G["dbt test"]
+    E -.-> G
+```
+
+The dbt layer in detail:
+
+```mermaid
+flowchart LR
+    S["stg_worldbank_indicators"] --> D1["dim_indicator"]
+    S --> F1["fct_indicator_observation"]
+    S --> M1["mart_macro_annual"]
+    D1 -.->|relationship test| F1
 ```
 
 ---
@@ -34,60 +55,98 @@ flowchart LR
 
 | Layer | Tool | Why |
 |---|---|---|
-| Ingestion | Python (`requests`, `pandas`) | Handles both API and file sources |
-| Storage | PostgreSQL — Docker locally, Azure when deployed | Warehouse for raw and modelled layers |
+| Ingestion | Python, `requests` | Handles pagination, retries, and completeness assertions |
+| Storage | PostgreSQL 16 (Docker) | Warehouse for the raw and modelled layers |
 | Transformation | dbt | Version-controlled SQL with built-in testing and lineage |
-| Visualisation | Streamlit | Fast path from queries to a shareable dashboard |
-| Environment | Docker Compose | One command to reproduce the database |
-| CI | GitHub Actions | Lint and compile checks on every push |
+| Visualisation | Streamlit, Plotly | A shareable dashboard straight from the marts |
+| Orchestration | Makefile | Cold start to tested warehouse in one target |
+| CI | GitHub Actions | Runs the whole pipeline against a real Postgres on every push |
+
+---
+
+## Data model
+
+| Model | Layer | Grain | Rows |
+|---|---|---|---|
+| `stg_worldbank_indicators` | staging (view) | country · indicator · year | 330 |
+| `dim_indicator` | mart | indicator | 5 |
+| `fct_indicator_observation` | mart | country · indicator · year | 330 |
+| `mart_macro_annual` | mart | country · year | 66 |
+
+`mart_macro_annual` pivots the five series into columns and adds two derived
+measures: year-on-year exchange-rate movement, and a trailing three-year
+inflation average computed with a window function.
+
+**Natural key:** `(country_code, indicator_code, year)`. The loader upserts on
+it, so re-running the pipeline is idempotent — the CI job asserts the row count
+is unchanged after a second run.
+
+---
+
+## What the tests actually caught
+
+The schema tests are not decoration. On their first run, `accepted_values` on
+`country_code` failed.
+
+The extractor was reading `obs["country"]["id"]`, which is the **ISO-2** code
+(`MA`). The adjacent `countryiso3code` field carries **ISO-3** (`MAR`). Both are
+present in every response and neither is labelled.
+
+Nothing else would have found it. The pipeline ran clean, the loader reported
+the right row count, and every *number* in the warehouse was correct — only the
+country identifier was wrong, and it would have stayed wrong until the first
+join on an ISO-3 key, long after anyone remembered why.
+
+The other 23 tests cover uniqueness, referential integrity, accepted ranges,
+and three singular tests on plausibility — including one asserting inflation
+stays within −15…60%, which would catch the API switching from an annual
+percentage to an index level.
 
 ---
 
 ## Data sources
 
-| Source | Content | Format |
+| Indicator | Code | Coverage |
 |---|---|---|
-| [World Bank Open Data](https://data.worldbank.org/country/morocco) | Inflation, GDP, unemployment | JSON API |
-| [HCP](https://www.hcp.ma/) / [data.gov.ma](https://www.data.gov.ma/) | Consumer price index | CSV |
-| Exchange rates | MAD against major currencies | API |
+| Inflation, consumer prices (annual %) | `FP.CPI.TOTL.ZG` | 100% |
+| GDP per capita (current US$) | `NY.GDP.PCAP.CD` | 100% |
+| Official exchange rate (MAD per US$) | `PA.NUS.FCRF` | 100% |
+| GDP growth (annual %) | `NY.GDP.MKTP.KD.ZG` | 89% |
+| Unemployment (% of labour force) | `SL.UEM.TOTL.ZS` | 53% |
 
-All sources are public and openly licensed. No personal data is collected or stored.
+All from [World Bank Open Data](https://data.worldbank.org/country/morocco),
+openly licensed. No personal data is collected or stored.
 
----
-
-## Roadmap
-
-- [ ] Exploratory analysis of source data
-- [ ] Extraction layer for all sources
-- [ ] Loading into PostgreSQL (`raw` schema), idempotent
-- [ ] dbt staging models
-- [ ] dbt mart models
-- [ ] Data quality tests
-- [ ] Streamlit dashboard
-- [ ] Deployed demo
-- [ ] CI pipeline
+Coverage below 100% is real: those years were never published. Missing values
+are kept as nulls rather than filled — zero would read as "no inflation that
+year", which is a different and false claim.
 
 ---
 
-## Getting started
+## Quick start
 
 ```bash
-# 1. Database
-cp .env.example .env          # then edit the password
-docker compose up -d
-docker compose ps             # postgres should be "healthy"
+cp .env.example .env            # then set a password
+docker compose up -d            # PostgreSQL 16
 
-# 2. Python environment
 python -m venv .venv
-.venv\Scripts\activate       # Windows
+.venv\Scripts\activate          # Windows
 pip install -r requirements.txt
+
+python run_pipeline.py          # extract + load, idempotent
+cp transform/profiles.yml.example transform/profiles.yml   # then set the password
+dbt deps  --project-dir transform
+dbt build --project-dir transform --profiles-dir transform
+
+streamlit run dashboard/app.py  # http://localhost:8501
 ```
 
-Useful afterwards:
+Or with `make`:
 
 ```bash
-docker compose down           # stop, keep the data
-docker compose down -v        # stop and wipe the data
+make all          # up, pipeline, build, test
+make dashboard
+make reset        # wipe the volume and start clean
 ```
 
 ---
@@ -96,16 +155,26 @@ docker compose down -v        # stop and wipe the data
 
 ```
 morocco-data-platform/
-├── extract/          # One module per data source
-├── load/             # Loading into PostgreSQL
-├── transform/        # dbt project
+├── extract/          # One module per source; asserts completeness
+├── load/             # Idempotent upsert into the raw schema
+├── transform/        # dbt project: staging, marts, tests
 ├── dashboard/        # Streamlit app
-├── notebooks/        # Exploratory analysis
-├── data/             # Local files (gitignored)
-├── docs/             # Architecture and decision records
-├── docker-compose.yml
-└── Makefile
+├── notebooks/        # Source exploration
+├── sql/init/         # Schema bootstrap, runs on first container start
+├── docs/             # Decision log and pipeline walkthrough
+└── .github/workflows # CI
 ```
+
+---
+
+## Documentation
+
+- **[docs/decisions.md](docs/decisions.md)** — why each choice was made, and
+  what was rejected
+- **[docs/pipeline-walkthrough.md](docs/pipeline-walkthrough.md)** —
+  line-by-line notes on the extractor and loader
+- **[notebooks/01_explore_worldbank.ipynb](notebooks/01_explore_worldbank.ipynb)**
+  — the source exploration, including the pagination finding
 
 ---
 
