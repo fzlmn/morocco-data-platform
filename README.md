@@ -6,7 +6,7 @@ dashboard.
 
 ![CI](https://github.com/fzlmn/morocco-data-platform/actions/workflows/ci.yml/badge.svg)
 
-> **Live demo:** _(link goes here once deployed)_
+> **Live demo:** **[morocco-data-platform.streamlit.app](https://morocco-data-platform.streamlit.app)**
 
 ---
 
