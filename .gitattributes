@@ -13,3 +13,10 @@
 *.jpg binary
 *.gif binary
 *.ico binary
+
+# GitHub's language detection weighs the notebook's committed outputs far more
+# heavily than the source, reporting this as a Jupyter project. The notebook is
+# documentation of the source exploration, not the deliverable.
+*.ipynb      linguist-documentation
+notebooks/** linguist-documentation
+docs/**      linguist-documentation

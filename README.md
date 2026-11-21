@@ -30,12 +30,12 @@ tested, and the result is queryable and visualised.
 
 ```mermaid
 flowchart LR
-    A["World Bank API<br/>5 indicator series"] --> B["extract/<br/>Python + requests"]
-    B --> C[("raw.worldbank_indicators<br/>PostgreSQL")]
-    C --> D["staging<br/>dbt view"]
-    D --> E["marts<br/>dbt tables"]
-    E --> F["Streamlit<br/>dashboard"]
-    D -.->|24 tests| G["dbt test"]
+    A[World Bank API] --> B[Python extract]
+    B --> C[(PostgreSQL raw schema)]
+    C --> D[dbt staging view]
+    D --> E[dbt mart tables]
+    E --> F[Streamlit dashboard]
+    D -.-> G[24 dbt tests]
     E -.-> G
 ```
 
@@ -43,10 +43,10 @@ The dbt layer in detail:
 
 ```mermaid
 flowchart LR
-    S["stg_worldbank_indicators"] --> D1["dim_indicator"]
-    S --> F1["fct_indicator_observation"]
-    S --> M1["mart_macro_annual"]
-    D1 -.->|relationship test| F1
+    S[stg_worldbank_indicators] --> D1[dim_indicator]
+    S --> F1[fct_indicator_observation]
+    S --> M1[mart_macro_annual]
+    D1 -.-> F1
 ```
 
 ---

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
@@ -89,7 +89,7 @@ def save_raw(indicator: str, payload: list, country: str = COUNTRY) -> Path:
 
 def to_records(meta: dict, observations: list[dict]) -> list[dict]:
     """Flatten observations into flat rows ready for the raw table."""
-    loaded_at = datetime.now(timezone.utc)
+    loaded_at = datetime.now(UTC)
     source_updated = meta.get("lastupdated")
 
     rows = []
