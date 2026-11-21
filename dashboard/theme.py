@@ -181,6 +181,13 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label > div[data-baseweb
     display: none !important;
 }}
 
+/* Structure-independent fallback: hide any direct child of the label that
+   does not contain a paragraph. The circle's wrapper has no <p>; the text
+   container does. This survives Streamlit reshuffling its markup. */
+section[data-testid="stSidebar"] div[role="radiogroup"] > label > div:not(:has(p)) {{
+    display: none !important;
+}}
+
 section[data-testid="stSidebar"] div[role="radiogroup"] p {{
     font-size: 14px; font-weight: 500; margin: 0;
     display: flex; align-items: center; gap: 12px;

@@ -1,11 +1,15 @@
 # Dashboard runtime. Streamlit Community Cloud installs this file, so it is
 # kept to what the app actually imports - adding dbt here makes every deploy
 # build ~50 extra packages, one of them from source.
-streamlit
-plotly
-pandas
+#
+# Versions are pinned so the deployed app is the one that was tested. An
+# unpinned streamlit meant Cloud resolved a different build than local, and
+# CSS that targets Streamlit's generated markup broke silently.
+streamlit==1.67.0
+plotly==7.1.0
+pandas==3.0.6
 
 # config.py and the warehouse connection
-sqlalchemy
-psycopg2-binary
-python-dotenv
+sqlalchemy==2.1.4
+psycopg2-binary==2.9.13
+python-dotenv==1.2.4
