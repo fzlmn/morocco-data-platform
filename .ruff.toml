@@ -16,5 +16,6 @@ select = ["E", "F", "W", "I", "UP", "B"]
 ignore = ["E501"]
 
 [lint.per-file-ignores]
-"dashboard/app.py" = ["E402"]   # sys.path is set before the imports by design
+"dashboard/app.py" = ["E402"]           # sys.path set before imports by design
+"scripts/export_snapshot.py" = ["E402"] # same
 "dashboard/icons.py" = ["E501"] # generated data URIs

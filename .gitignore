@@ -14,6 +14,11 @@ data/
 *.db
 *.sqlite3
 !data/.gitkeep
+
+# The snapshot IS committed - it is what the public demo reads.
+!data/snapshot/
+!data/snapshot/*.csv
+!data/snapshot/*.txt
 !**/seeds/*.csv
 
 # --- Python ---

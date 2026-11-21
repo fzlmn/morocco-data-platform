@@ -1,0 +1,20 @@
+# Everything beyond the dashboard: the pipeline, dbt, notebooks, linting.
+# Install alongside requirements.txt:
+#     pip install -r requirements.txt -r requirements-dev.txt
+-r requirements.txt
+
+# Extraction
+requests
+
+# Transformation
+dbt-postgres
+
+# Exploration
+ipykernel
+matplotlib
+
+# Linting
+ruff
+
+# Once the environment is stable, pin it:
+#   pip freeze > requirements-lock.txt

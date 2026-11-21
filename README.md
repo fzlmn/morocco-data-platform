@@ -131,7 +131,7 @@ docker compose up -d            # PostgreSQL 16
 
 python -m venv .venv
 .venv\Scripts\activate          # Windows
-pip install -r requirements.txt
+pip install -r requirements.txt -r requirements-dev.txt
 
 python run_pipeline.py          # extract + load, idempotent
 cp transform/profiles.yml.example transform/profiles.yml   # then set the password

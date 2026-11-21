@@ -1,22 +1,11 @@
-# Core
-pandas
-requests
-python-dotenv
-
-# Database
-sqlalchemy
-psycopg2-binary
-
-# Exploration
-ipykernel
-matplotlib
-
-# Transformation
-dbt-postgres
-
-# Dashboard
+# Dashboard runtime. Streamlit Community Cloud installs this file, so it is
+# kept to what the app actually imports - adding dbt here makes every deploy
+# build ~50 extra packages, one of them from source.
 streamlit
 plotly
+pandas
 
-# Once your environment is stable, pin it:
-#   pip freeze > requirements.txt
+# config.py and the warehouse connection
+sqlalchemy
+psycopg2-binary
+python-dotenv

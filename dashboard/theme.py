@@ -269,6 +269,10 @@ section[data-testid="stSidebar"] hr {{
     border-radius: 8px; font-size: 12px; margin-right: 8px;
 }}
 
+.pill.snap {{
+    background: #fdf4e3; color: #92600e; border-color: #f0dcb4;
+}}
+
 /* ===== stat cards ===== */
 .stat-top {{
     display: flex; align-items: flex-start; justify-content: space-between;

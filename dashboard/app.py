@@ -46,42 +46,57 @@ def get_engine():
     return create_engine(_database_url(), future=True, pool_pre_ping=True)
 
 
-def _query(sql: str) -> pd.DataFrame:
-    with get_engine().connect() as conn:
-        return pd.read_sql(text(sql), conn)
+SNAPSHOT = ROOT / "data" / "snapshot"
 
-
-@st.cache_data(ttl=600)
-def load_macro():
-    return _query("""
+QUERIES = {
+    "macro_annual": """
         select year, inflation_pct, inflation_3y_avg, gdp_growth_pct,
                gdp_per_capita_usd, unemployment_pct, mad_per_usd,
                mad_depreciation_pct, decade
         from analytics.mart_macro_annual
         where country_code = 'MAR'
         order by year
-    """)
-
-
-@st.cache_data(ttl=600)
-def load_indicators():
-    return _query("""
+    """,
+    "indicators": """
         select indicator_name, domain, unit_type, first_year, last_year,
                observation_count, observed_count, missing_count, coverage_pct
         from analytics.dim_indicator
         order by coverage_pct desc, indicator_name
-    """)
-
-
-@st.cache_data(ttl=600)
-def load_missing():
-    return _query("""
+    """,
+    "missing_years": """
         select d.indicator_name, f.year
         from analytics.fct_indicator_observation f
         join analytics.dim_indicator d using (indicator_code)
         where f.is_missing
         order by d.indicator_name, f.year
-    """)
+    """,
+}
+
+
+@st.cache_data(ttl=600, show_spinner=False)
+def load_all() -> tuple[dict[str, pd.DataFrame], str]:
+    """Read the warehouse if it is reachable, otherwise the committed snapshot.
+
+    Streamlit Community Cloud cannot reach a Postgres running locally, so the
+    public deployment falls back to CSVs generated from the marts by
+    scripts/export_snapshot.py. The source in use is reported on screen rather
+    than hidden - a dashboard that silently serves stale data is worse than
+    one that says where its numbers came from.
+    """
+    try:
+        with get_engine().connect() as conn:
+            frames = {name: pd.read_sql(text(sql), conn)
+                      for name, sql in QUERIES.items()}
+        return frames, "warehouse"
+    except Exception:
+        frames = {name: pd.read_csv(SNAPSHOT / f"{name}.csv")
+                  for name in QUERIES}
+        return frames, "snapshot"
+
+
+def snapshot_date() -> str:
+    stamp = SNAPSHOT / "generated_at.txt"
+    return stamp.read_text(encoding="utf-8").strip() if stamp.exists() else ""
 
 
 # --- components ------------------------------------------------------------
@@ -167,11 +182,17 @@ def area(df, column, title, colour, y_title, suffix="%", decimals=2,
 # --- load ------------------------------------------------------------------
 
 try:
-    macro, indicators, missing = load_macro(), load_indicators(), load_missing()
+    frames, data_source = load_all()
+    macro = frames["macro_annual"]
+    indicators = frames["indicators"]
+    missing = frames["missing_years"]
 except Exception as exc:
-    st.error("Could not reach the warehouse. Run `docker compose up -d`, then "
-             "`python run_pipeline.py`, then "
-             "`dbt run --project-dir transform --profiles-dir transform`.")
+    st.error(
+        "No data available. Either start the warehouse "
+        "(`docker compose up -d`, `python run_pipeline.py`, `dbt build`), "
+        "or generate the snapshot with "
+        "`python scripts/export_snapshot.py`."
+    )
     st.exception(exc)
     st.stop()
 
@@ -225,6 +246,9 @@ with st.sidebar:
           <div class="v">{year_min}–{year_max} · {len(indicators)} indicators</div>
           <div class="k">Quality</div>
           <div class="v">24 / 24 tests passing</div>
+          <div class="k">Serving from</div>
+          <div class="v">{"live warehouse" if data_source == "warehouse"
+                          else "committed snapshot"}</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -247,6 +271,8 @@ st.markdown(
         <span class="pill">{start}–{end}</span>
         <span class="pill">{len(view)} years</span>
         <span class="pill">330 observations</span>
+        {'<span class="pill snap">snapshot · ' + snapshot_date() + '</span>'
+         if data_source == "snapshot" else ''}
       </div>
     </div>
     """, unsafe_allow_html=True)
