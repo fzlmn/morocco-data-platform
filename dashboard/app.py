@@ -137,7 +137,7 @@ def stat_card(container, label, column, df, icon_name, colour,
         if len(trail) > 1:
             st.plotly_chart(theme.sparkline(trail["year"], trail[column],
                                             colour),
-                            use_container_width=True, config=CFG,
+                            width="stretch", config=CFG,
                             key=f"spark_{column}")
 
 
@@ -287,18 +287,18 @@ if page_name == "Overview":
         fig.update_layout(**theme.base_layout(height=380,
                                               show_legend=smoothing))
         theme.style_axes(fig, y_title="annual %", zeroline=True)
-        st.plotly_chart(fig, use_container_width=True, config=CFG,
+        st.plotly_chart(fig, width="stretch", config=CFG,
                         key="ov_inflation")
 
     left, right = st.columns(2)
     with left.container(border=True):
         st.plotly_chart(area(view, "gdp_per_capita_usd", "GDP per capita",
                              BLUE, "current US$", suffix="", decimals=0),
-                        use_container_width=True, config=CFG, key="ov_gdppc")
+                        width="stretch", config=CFG, key="ov_gdppc")
     with right.container(border=True):
         st.plotly_chart(area(view, "unemployment_pct", "Unemployment",
                              ORANGE, "% of labour force"),
-                        use_container_width=True, config=CFG, key="ov_unemp")
+                        width="stretch", config=CFG, key="ov_unemp")
 
 # --- Prices & currency -----------------------------------------------------
 
@@ -328,7 +328,7 @@ elif page_name == "Prices & currency":
         for ann in fig2.layout.annotations:
             ann.font = dict(size=12, color=theme.INK_SECONDARY)
         theme.style_axes(fig2, zeroline=True)
-        st.plotly_chart(fig2, use_container_width=True, config=CFG,
+        st.plotly_chart(fig2, width="stretch", config=CFG,
                         key="pr_panels")
 
     section("Year-on-year currency movement",
@@ -346,7 +346,7 @@ elif page_name == "Prices & currency":
             showlegend=False, hovertemplate="%{y:+.2f}%<extra></extra>"))
         fig3.update_layout(**theme.base_layout(height=300))
         theme.style_axes(fig3, y_title="% change", zeroline=True)
-        st.plotly_chart(fig3, use_container_width=True, config=CFG,
+        st.plotly_chart(fig3, width="stretch", config=CFG,
                         key="pr_dep")
 
 # --- Output & labour -------------------------------------------------------
@@ -360,7 +360,7 @@ elif page_name == "Output & labour":
         st.plotly_chart(area(view, "gdp_per_capita_usd",
                              "GDP per capita (current US$)", BLUE, "US$",
                              suffix="", decimals=0),
-                        use_container_width=True, config=CFG, key="out_gdppc")
+                        width="stretch", config=CFG, key="out_gdppc")
     with right.container(border=True):
         g = view.dropna(subset=["gdp_growth_pct"])
         fig4 = go.Figure(go.Bar(
@@ -372,7 +372,7 @@ elif page_name == "Output & labour":
             showlegend=False, hovertemplate="%{y:.2f}%<extra></extra>"))
         fig4.update_layout(**theme.base_layout(title="GDP growth", height=320))
         theme.style_axes(fig4, y_title="annual %", zeroline=True)
-        st.plotly_chart(fig4, use_container_width=True, config=CFG,
+        st.plotly_chart(fig4, width="stretch", config=CFG,
                         key="out_growth")
 
     section("Labour", "Unemployment is a modelled ILO estimate and the series "
@@ -381,7 +381,7 @@ elif page_name == "Output & labour":
     with st.container(border=True):
         st.plotly_chart(area(view, "unemployment_pct", "Unemployment", ORANGE,
                              "% of labour force", height=300),
-                        use_container_width=True, config=CFG, key="out_unemp")
+                        width="stretch", config=CFG, key="out_unemp")
 
     section("By decade", "Averages across each decade in the selected range.")
     with st.container(border=True):
@@ -392,7 +392,7 @@ elif page_name == "Output & labour":
                 unemployment=("unemployment_pct", "mean"),
                 gdp_per_capita=("gdp_per_capita_usd", "mean"),
             ).round(2).reset_index(),
-            use_container_width=True, hide_index=True)
+            width="stretch", hide_index=True)
 
 # --- Definitions -----------------------------------------------------------
 
@@ -496,7 +496,7 @@ elif page_name == "Data quality":
         fig5.update_xaxes(range=[0, 118], showgrid=False, showticklabels=False)
         fig5.update_yaxes(showgrid=False,
                           tickfont=dict(color=theme.INK_SECONDARY, size=11))
-        st.plotly_chart(fig5, use_container_width=True, config=CFG,
+        st.plotly_chart(fig5, width="stretch", config=CFG,
                         key="dq_cov")
 
     section("Which years are missing",
@@ -513,12 +513,12 @@ elif page_name == "Data quality":
                 .agg(["count", "min", "max"])
                 .rename(columns={"count": "missing years", "min": "earliest",
                                  "max": "latest"}).reset_index(),
-                use_container_width=True, hide_index=True)
+                width="stretch", hide_index=True)
 
     with st.expander("Indicator catalogue"):
-        st.dataframe(indicators, use_container_width=True, hide_index=True)
+        st.dataframe(indicators, width="stretch", hide_index=True)
     with st.expander("Full table"):
-        st.dataframe(view, use_container_width=True, hide_index=True)
+        st.dataframe(view, width="stretch", hide_index=True)
         st.download_button("Download CSV",
                            view.to_csv(index=False).encode("utf-8"),
                            file_name=f"morocco_macro_{start}_{end}.csv",
