@@ -1,0 +1,6 @@
+indicator_name,domain,unit_type,first_year,last_year,observation_count,observed_count,missing_count,coverage_pct
+GDP per capita (current US$),Output,usd,1960,2025,66,66,0,100.0
+"Inflation, consumer prices (annual %)",Prices,percent,1960,2025,66,66,0,100.0
+"Official exchange rate (LCU per US$, period average)",Prices,exchange_rate,1960,2025,66,66,0,100.0
+GDP growth (annual %),Output,percent,1960,2025,66,59,7,89.4
+"Unemployment, total (% of total labor force) (modeled ILO estimate)",Labour,percent,1960,2025,66,35,31,53.0

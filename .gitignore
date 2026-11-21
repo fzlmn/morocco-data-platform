@@ -7,7 +7,9 @@
 profiles.yml
 
 # --- Data: keep the repo light ---
-data/
+# data/* not data/ - git will not descend into an excluded
+# directory, so a negation inside one never applies.
+data/*
 *.csv
 *.json
 *.parquet
